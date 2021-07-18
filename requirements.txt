@@ -1,0 +1,6 @@
+pymongo
+pymongo[srv]
+requests
+beautifulsoup4
+selenium
+webdriver-manager
