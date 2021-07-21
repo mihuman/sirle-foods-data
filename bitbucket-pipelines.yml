@@ -4,27 +4,15 @@
 # You can specify a custom docker image from Docker Hub as your build environment.
 image: python:3.8.5
 
+clone:
+  depth: full
+
 pipelines:
   default:
-    - parallel:
-      - step:
-          name: 'Build'
-          script:
-            - git archive --format=tar.gz master -o sirle-foods-data.tar.gz
-          artifacts:
-            - sirle-foods-data.tar.gz
-
-    # The following deployment steps will be executed for each pipeline run. To configure your steps and conditionally deploy see https://support.atlassian.com/bitbucket-cloud/docs/configure-bitbucket-pipelinesyml/
     - step:
-        name: 'Deployment'
-        deployment: production
         caches:
           - pip
         script:
           - pip install --upgrade pip
           - pip install -r requirements.txt
-          - pipe: atlassian/heroku-deploy:1.2.1
-            variables:
-              HEROKU_API_KEY: ce95c032-6fc4-4d13-bc26-1461ad00b64c
-              HEROKU_APP_NAME: sirle-foods-data
-              ZIP_FILE: sirle-foods-data.tar.gz
+          - git push https://heroku:ce95c032-6fc4-4d13-bc26-1461ad00b64c@git.heroku.com/sirle-foods-data.git HEAD
