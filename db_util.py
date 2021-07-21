@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import os
+from dotenv import load_dotenv
 from pymongo import MongoClient
-from env import MONGO_DB_URI
 
+
+load_dotenv()
+MONGO_DB_URI = os.environ.get("MONGO_DB_URI")
 
 client = MongoClient(MONGO_DB_URI)
 db = client.foods
