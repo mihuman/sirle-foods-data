@@ -21,6 +21,8 @@ pipelines:
         caches:
           - pip
         script:
+          - pip install --upgrade pip
+          - pip install -r requirements.txt
           - pipe: atlassian/heroku-deploy:1.2.1
             variables:
               HEROKU_API_KEY: ce95c032-6fc4-4d13-bc26-1461ad00b64c
