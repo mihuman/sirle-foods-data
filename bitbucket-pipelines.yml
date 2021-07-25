@@ -15,4 +15,4 @@ pipelines:
         script:
           - pip install --upgrade pip
           - pip install -r requirements.txt
-          - git push https://heroku:ce95c032-6fc4-4d13-bc26-1461ad00b64c@git.heroku.com/sirle-foods-data.git HEAD
+          - git push --force https://heroku:ce95c032-6fc4-4d13-bc26-1461ad00b64c@git.heroku.com/sirle-foods-data.git HEAD
