@@ -3,6 +3,7 @@
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -152,8 +153,10 @@ def open_browser():
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
     options.add_argument("--log-level=OFF")
 
+    service = Service(ChromeDriverManager().install())
+
     global driver
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+    driver = webdriver.Chrome(service=service, options=options)
 
 def close_browser():
     driver.quit()
