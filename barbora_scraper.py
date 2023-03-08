@@ -2,9 +2,6 @@
 
 import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
 import traceback
 
@@ -20,8 +17,6 @@ NETWORK_ERROR_SLEEP = 60
 params = {
     "page": 1
 }
-driver = None
-cookies = None
 
 
 def has_next_products_page(soup):
@@ -54,7 +49,7 @@ def get_contents(soup):
         return product_info.find_all("dd")[list_index].text.strip()
 
 def get_page_soup(url, query_params=None):
-    page = requests.get(url, params=query_params, cookies=cookies)
+    page = requests.get(url, params=query_params)
     sleep(PAGE_SWITCH_SLEEP)
     return BeautifulSoup(page.text, "html.parser")
 
@@ -121,43 +116,7 @@ def handle_products_page(url):
     except Exception as e:
         handle_error(e, url)
 
-def open_browser():
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    options.add_experimental_option("excludeSwitches", ["enable-logging"])
-    options.add_argument("--log-level=OFF")
-
-    service = Service(ChromeDriverManager().install())
-
-    global driver
-    driver = webdriver.Chrome(service=service, options=options)
-
-def select_region():
-    driver.get(BASE_URL)
-    driver.find_element_by_xpath("//*[@id='counties-data']/div[1]/div/button").click()
-    sleep(1)
-    driver.find_element_by_xpath("//*[@id='counties-data']/div[1]/div/button").click()
-    sleep(1)
-
-def save_cookies():
-    global cookies
-    cookies = {}
-
-    for cookie in driver.get_cookies():
-        cookies[cookie["name"]] = cookie["value"]
-
-def close_browser():
-    driver.quit()
-
-def setup_cookies():
-    open_browser()
-    select_region()
-    save_cookies()
-    close_browser()
-
 def scrape():
-    setup_cookies()
-    
     for category in conf.CATEGORIES:
         print(category)
         path = conf.CATEGORIES[category]
