@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 CATEGORIES = {
+    "Talu Toidab": "/epood/ee/tooted/talu-toidab/c/SH-19",
+    "Peolaud - telli ette!": "/epood/ee/tooted/peolaud---telli-ette-/c/SH-20",
     "Puuviljad, köögiviljad, lilled": "/epood/ee/tooted/puuviljad-koogiviljad-lilled/c/SH-12",
     "Piimatooted, munad, juust": "/epood/ee/tooted/piimatooted-munad-juust/c/SH-11",
     "Liha- ja kalatooted": "/epood/ee/tooted/liha--ja-kalatooted/c/SH-8",
@@ -12,5 +14,9 @@ CATEGORIES = {
     "Külmutatud toidukaubad": "/epood/ee/tooted/kulmutatud-toidukaubad/c/SH-4",
     "Joogid": "/epood/ee/tooted/joogid/c/SH-3",
     "Lastekaubad": "/epood/ee/tooted/lastekaubad/c/SH-5",
+    "Lemmikloomakaubad": "/epood/ee/tooted/lemmikloomakaubad/c/SH-7",
+    "Enesehooldustarbed": "/epood/ee/tooted/enesehooldustarbed/c/SH-2",
+    "Puhastusvahendid": "/epood/ee/tooted/puhastusvahendid/c/SH-14",
+    "Kodu- ja vabaajakaubad": "/epood/ee/tooted/kodu--ja-vabaajakaubad/c/SH-10",
     "Alkohol": "/epood/ee/tooted/alkohol/c/SH-1"
 }

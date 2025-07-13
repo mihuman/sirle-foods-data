@@ -41,7 +41,7 @@ def get_total_product_count(soup):
     return int(soup.find("span", {"class": "count"}).text.replace(" toodet", ""))
 
 def has_product_with_url(url):
-    return db_util.get_product_by_url(url) != None
+    return db_util.get_product_by_url(url) is not None
 
 def get_product_title(soup):
     return soup.find("h1").text.strip()

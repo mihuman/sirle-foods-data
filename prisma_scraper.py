@@ -10,65 +10,38 @@ import db_util
 
 
 BASE_URL = "https://www.prismamarket.ee"
-PRODUCTS_ON_PAGE = 48
 
 PAGE_SWITCH_SLEEP = 1
 NETWORK_ERROR_SLEEP = 60
 
 params = {
-    "main_view": 1
-}
-page = {
-    "products": 1
+    "page": 1
 }
 
-# Disable warnings for SSL certificate problems
-requests.packages.urllib3.disable_warnings()
 
-
-def get_subcategory_link_objects(soup):
-    return [link for link in soup.find_all("a", {"class": "name"})]
+def has_next_products_page(soup):
+    return soup.find("a", string="Järgmine leht") is not None
 
 def get_product_links(soup):
-    return [link.get("href") for link in soup.find_all("a", {"class": "js-link-item"})]
-
-def get_products_total(soup):
-    return int(soup.find("div", {"class": "category-items"}).find("b").text)
-
-def has_next_products_page(products_total):
-    return page["products"] * PRODUCTS_ON_PAGE < products_total
-
-def get_normalized_product_url(url):
-    # PRISMA can have different URL patterns for the same product
-    # Return normalized product URL that looks like this:
-    # https://www.prismamarket.ee/entry/<product-name>/<barcode>
-    parts = url.split("/")
-    category_id = parts.pop(4)
-
-    try:
-        int(category_id)
-        return "/".join(parts)
-    except ValueError:
-        return url
+    return [link.get("href") for link in soup.select("div.card a")]
 
 def has_product_with_url(url):
-    return db_util.get_product_by_url(url) != None
+    return db_util.get_product_by_url(url) is not None
 
 def get_product_title(soup):
-    title = soup.find("h1", {"id": "product-name"}).text.strip()
-    producer = soup.find("h2", {"id": "product-subname"}).text.strip()
-    return f"{title}, {producer}" if len(producer) > 0 else title
+    return soup.find("h1").text.strip()
 
 def get_barcode(soup):
-    return soup.find("span", {"itemprop": "sku"}).text.strip()
+    ean_element = soup.find("h3", string="EAN")
+    return ean_element.find_next("div").find("span").text.strip()
 
 def get_contents(soup):
-    contents_container = soup.find("p", {"id": "product-ingredients"})
-    if contents_container != None:
-        return contents_container.text.strip()
+    contents_element = soup.find("h3", string="Koostisosad")
+    if contents_element:
+        return contents_element.find_next("div").text.strip()
 
 def get_page_soup(url, query_params=None):
-    page = requests.get(url, params=query_params, verify=False)
+    page = requests.get(url, params=query_params)
     sleep(PAGE_SWITCH_SLEEP)
     return BeautifulSoup(page.text, "html.parser")
 
@@ -80,17 +53,17 @@ def handle_error(error, url):
     if isinstance(error, requests.exceptions.ConnectionError):
         print("NETWORK ERROR")
         sleep(NETWORK_ERROR_SLEEP)
-    
+
     # page parsing errors
     elif isinstance(error, TypeError):
         print(f"TYPE ERROR: {url}")
         traceback.print_exc()
-    
+
     # page parsing errors
     elif isinstance(error, AttributeError):
         print(f"ATTRIBUTE ERROR: {url}")
         traceback.print_exc()
-    
+
     # other errors
     elif isinstance(error, Exception):
         print(f"OTHER ERROR: {url}")
@@ -113,47 +86,25 @@ def handle_products_page(url):
     try:
         soup = get_page_soup(url, params)
 
-        products_total = get_products_total(soup)
-        has_next_page = has_next_products_page(products_total)
+        has_next_page = has_next_products_page(soup)
         links = get_product_links(soup)
 
-        product_index = 0
+        link_index = 0
 
-        while product_index < len(links):
-            print(f"Page {page['products']}: {product_index + 1}/{len(links)}", end="\r")
-            path = links[product_index]
-            product_url = get_normalized_product_url(f"{BASE_URL}{path}")
+        while link_index < len(links):
+            print(f"Page {params['page']}: {link_index + 1}/{len(links)}", end="\r")
+            product_url = f"{BASE_URL}{links[link_index]}"
 
-            if has_product_with_url(product_url):
-                product_index += 1
+            if has_product_with_url(f"{BASE_URL}{product_url}"):
+                link_index += 1
                 continue
             else:
                 handle_product_page(product_url)
-                product_index += 1
+                link_index += 1
 
         if has_next_page:
-            page["products"] += 1
+            params["page"] += 1
             return True
-    
-    except Exception as e:
-        handle_error(e, url)
-
-def handle_category_page(url):
-    try:
-        soup = get_page_soup(url)
-        link_objects = get_subcategory_link_objects(soup)
-
-        for link in link_objects:
-            subcategory = link.text
-            path = link.get("href")
-            print(subcategory)
-
-            page["products"] = 1
-            has_next_page = True
-
-            while has_next_page:
-                products_url = f"{BASE_URL}{path}/page/{page['products']}"
-                has_next_page = handle_products_page(products_url)
     
     except Exception as e:
         handle_error(e, url)
@@ -162,9 +113,15 @@ def scrape():
     for category in conf.CATEGORIES:
         print(category)
         path = conf.CATEGORIES[category]
-        url = f"{BASE_URL}{path}"
 
-        handle_category_page(url)
+        params["page"] = 1
+        has_next_page = True
+
+        while has_next_page:
+            print(f"Page {params['page']}", end="\r")
+            url = f"{BASE_URL}{path}"
+            
+            has_next_page = handle_products_page(url)
 
 
 if __name__ == "__main__":

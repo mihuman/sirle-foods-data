@@ -15,7 +15,7 @@ NETWORK_ERROR_SLEEP = 60
 
 
 def has_product_with_barcode(barcode):
-    return db_util.get_retailer_product_by_barcode("KAUPMEES", barcode) != None
+    return db_util.get_retailer_product_by_barcode("KAUPMEES", barcode) is not None
 
 def insert_product_to_database(url, title, barcode, contents):
     db_util.insert_product(url, title, barcode, contents, "KAUPMEES")
