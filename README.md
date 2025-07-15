@@ -1,6 +1,6 @@
 # Data scraping scripts for Sirle foods
 
-Collection of Python scripts for scraping websites of all major food retailers (Selver, Prisma, Rimi, Barbora, Coop, Kaupmees) in Estonia. Updates documents in MongoDB.
+Collection of Python scripts for scraping websites of all major food retailers (Selver, Prisma, Rimi, Barbora, Kaupmees) in Estonia. Updates documents in MongoDB.
 
 
 ## Installation
