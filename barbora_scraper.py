@@ -18,7 +18,7 @@ import db_util
 
 BASE_URL = "https://barbora.ee"
 
-PAGE_LOAD_DELAY = 10
+PAGE_LOAD_DELAY = 20
 PAGE_SWITCH_SLEEP = 1
 NETWORK_ERROR_SLEEP = 60
 
@@ -34,21 +34,22 @@ def has_next_products_page(soup):
     last_link = pagination.find_all("li")[-1].find("a").get("href")
     return active_link != last_link
 
-def get_product_links():
+def get_product_links_with_prices():
     script = """
-    const getLinks = () => {
-        const result = [];
+    const getLinksWithPrices = () => {
+        const result = {};
 
         const shadowRootElSelector = 'div#category-page-results-placeholder > div > ul > li > div > div';
         document.querySelectorAll(shadowRootElSelector).forEach((el) => {
             const root = el.shadowRoot;
             const linkEl = root.querySelector('a');
-            result.push(linkEl.href);
+            const priceEl = root.querySelector('meta[itemprop="price"]');
+            result[linkEl.href] = priceEl ? parseFloat(priceEl.content) : null;
         });
 
         return result;
     };
-    return getLinks();
+    return getLinksWithPrices();
     """
 
     return driver.execute_script(script)
@@ -92,8 +93,8 @@ def get_page_soup(url, wait_for_selector, query_params=None):
     except TimeoutException as e:
         raise e
 
-def insert_product_to_database(url, title, contents):
-    db_util.insert_product(url, title, None, contents, "BARBORA")
+def insert_product_to_database(url, title, contents, price):
+    db_util.insert_product(url, title, None, contents, price, "BARBORA")
 
 def handle_error(error, url):
     # network errors
@@ -116,14 +117,14 @@ def handle_error(error, url):
         print(f"OTHER ERROR: {url}")
         traceback.print_exc()
 
-def handle_product_page(url):
+def handle_product_page(url, price):
     try:
         soup = get_page_soup(url, "h1.b-product-info--title")
 
         title = get_product_title(soup)
         contents = get_contents(soup)
 
-        insert_product_to_database(url, title, contents)
+        insert_product_to_database(url, title, contents, price)
 
     except Exception as e:
         handle_error(e, url)
@@ -134,20 +135,20 @@ def handle_products_page(url):
         soup = get_page_soup(url, selector, params)
 
         has_next_page = has_next_products_page(soup)
-        links = get_product_links()
+        links_with_prices = get_product_links_with_prices()
 
         link_index = 0
 
-        while link_index < len(links):
-            print(f"Page {params['page']}: {link_index + 1}/{len(links)}", end="\r")
-            product_url = links[link_index]
+        for product_url, price in links_with_prices.items():
+            print(f"Page {params['page']}: {link_index + 1}/{len(links_with_prices)}", end="\r")
 
             if has_product_with_url(product_url):
-                link_index += 1
-                continue
+                if price is not None:
+                    db_util.update_product_price(product_url, price)
             else:
-                handle_product_page(product_url)
-                link_index += 1
+                handle_product_page(product_url, price)
+
+            link_index += 1
 
         if has_next_page:
             params["page"] += 1

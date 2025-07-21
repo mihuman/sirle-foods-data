@@ -32,8 +32,25 @@ driver = None
 def has_next_products_page(soup):
     return soup.select_one("div.sf-pagination__item--next a") is not None
 
-def get_product_links(soup):
-    return [link.get("href") for link in soup.select("h3.ProductCard__title a.ProductCard__link")]
+def get_product_price(product_card):
+    prices_div = product_card.find("div", {"class": "ProductPrices"})
+
+    if prices_div.find("div", {"class": "ProductPrice--special"}):
+        price_text = prices_div.find("div", {"class": "ProductPrice--special"}).text.strip().split(" ")[0]
+        return float(price_text.replace(",", ".").strip())
+
+    price_text = prices_div.find("div", {"class": "ProductPrice"}).text.strip().split(" ")[0]
+    return float(price_text.replace(",", ".").strip())
+
+def get_product_links_with_prices(soup):
+    result = {}
+
+    for item in soup.select("div.ProductCard"):
+        link = item.find("a", {"class": "ProductCard__link"}).get("href")
+        price = get_product_price(item)
+        result[link] = price
+
+    return result
 
 def has_product_with_url(url):
     return db_util.get_product_by_url(url) is not None
@@ -72,8 +89,8 @@ def get_page_soup(url, wait_for_selector, query_params=None):
     except TimeoutException as e:
         raise e
 
-def insert_product_to_database(url, title, barcode, contents):
-    db_util.insert_product(url, title, barcode, contents, "SELVER")
+def insert_product_to_database(url, title, barcode, contents, price):
+    db_util.insert_product(url, title, barcode, contents, price, "SELVER")
 
 def handle_error(error, url):
     # network errors
@@ -96,7 +113,7 @@ def handle_error(error, url):
         print(f"OTHER ERROR: {url}")
         traceback.print_exc()
 
-def handle_product_page(url):
+def handle_product_page(url, price):
     try:
         soup = get_page_soup(url, "h1")
 
@@ -104,7 +121,7 @@ def handle_product_page(url):
         barcode = get_barcode(soup)
         contents = get_contents(soup)
 
-        insert_product_to_database(url, title, barcode, contents)
+        insert_product_to_database(url, title, barcode, contents, price)
 
     except Exception as e:
         handle_error(e, url)
@@ -114,20 +131,21 @@ def handle_products_page(url):
         soup = get_page_soup(url, ".ProductCard", params)
 
         has_next_page = has_next_products_page(soup)
-        links = get_product_links(soup)
+        links_with_prices = get_product_links_with_prices(soup)
 
         link_index = 0
 
-        while link_index < len(links):
-            print(f"Page {params['page']}: {link_index + 1}/{len(links)}", end="\r")
-            product_url = f"{BASE_URL}{links[link_index]}"
+        for product_url, price in links_with_prices.items():
+            print(f"Page {params['page']}: {link_index + 1}/{len(links_with_prices)}", end="\r")
+            full_url = f"{BASE_URL}{product_url}"
 
-            if has_product_with_url(product_url):
-                link_index += 1
-                continue
+            if has_product_with_url(full_url):
+                if price is not None:
+                    db_util.update_product_price(full_url, price)
             else:
-                handle_product_page(product_url)
-                link_index += 1
+                handle_product_page(full_url, price)
+
+            link_index += 1
 
         if has_next_page:
             params["page"] += 1

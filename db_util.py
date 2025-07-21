@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
@@ -21,11 +22,19 @@ def get_retailer_product_by_barcode(retailer, barcode):
 def get_all_products_by_barcode(barcode):
     return db.products.find({"bc": barcode})
 
-def insert_product(url, title, barcode, contents, retailer):
+def insert_product(url, title, barcode, contents, price, retailer):
     db.products.insert_one({
         "url": url,
         "title": title,
         "bc": barcode,
         "cts": contents,
-        "rtlr": retailer
+        "prc": price,
+        "rtlr": retailer,
+        "lastScraped": int(time.time() * 1000)
     })
+
+def update_product_price(url, price):
+    db.products.update_one(
+        {"url": url},
+        {"$set": {"prc": price, "lastScraped": int(time.time() * 1000)}}
+    )
