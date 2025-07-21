@@ -7,9 +7,9 @@ CATEGORIES = {
         "koogiviljad-juurviljad",
         "seened",
         "maitsetaimed-varsked-saltid-piprad",
-        "smuutid-varsked-mahlad",
         "puuviljasalatid",
-        "marjad"
+        "marjad",
+        "smuutid-varsked-mahlad"
     ],
     "liha-ja-kalatooted": [
         "sealiha",
@@ -56,6 +56,18 @@ CATEGORIES = {
         "magustoidud",
         "sushi"
     ],
+    "suurpakendid": [
+        "puu-ja-koogiviljad",
+        "piimatooted",
+        "lihatooted",
+        "jahutatud-valmistoit",
+        "salatid",
+        "kuivained",
+        "maitseained",
+        "hoidised",
+        "kastmed-ja-olid",
+        "joogid"
+    ],
     "kuivained-hoidised": [
         "kuivained-hommikusoogid",
         "hoidised",
@@ -69,7 +81,8 @@ CATEGORIES = {
     "kastmed-olid": [
         "olid-aadikad",
         "majoneesid-sinepid",
-        "ketsupid-tomatipastad-kastmed"
+        "ketsupid-tomatipastad-kastmed",
+        "gurmee-kastmed"
     ],
     "maiustused-kupsised-naksid": [
         "kommipakid",
@@ -95,12 +108,58 @@ CATEGORIES = {
         "spordijoogid-pulbrid-batoonid",
         "kohv-tee-kakao",
         "lahja-alkohol",
-        "kange-alkohol"
+        "kange-alkohol",
+        "valgumihklid-ja-tikud"
     ],
     "lastekaubad": [
-        "lastetoidud"
+        "lastetoidud",
+        "mahkmed",
+        "beebi-hooldusvahendid",
+        "tarvikud",
+        "manguasjad",
+        "laste-sokid-sukad-pesu"
+    ],
+    "lemmiklooma-kaubad": [
+        "kassitoidud",
+        "koeratoidud",
+        "vaikeloomatoidud",
+        "kala-ja-linnutoidud",
+        "lemmikloomatarbed"
     ],
     "enesehooldustarbed": [
+        "suuhooldus",
+        "naohooldus",
+        "juuksehooldus",
+        "kehahooldus",
+        "dekoratiivkosmeetikatooted",
         "tervisekaubad"
+    ],
+    "majapidamis-ja-kodukaubad": [
+        "paberitooted",
+        "puhastus-ja-koristusvahendid",
+        "roivaste-ja-jalatsite-hooldus",
+        "muud-majapidamise-kaubad",
+        "koogitarbed",
+        "kodutehnika",
+        "vannitoa-ja-saunatarvikud",
+        "tekid-padjad-tekstiil",
+        "sisustuskaubad",
+        "aiakaubad"
+    ],
+    "vabaajakaubad": [
+        "autokaubad",
+        "garderoobikaubad",
+        "manguasjad",
+        "kontori-ja-koolitarbed",
+        "sportimisevahendid",
+        "reisi-ja-matkatarbed",
+        "raamatud-ajakirjad",
+        "meedia"
+    ],
+    "hooajakaubad": [
+        "kevadkaubad"
+    ],
+    "puhade-ja-tahtpaevakaubad": [
+        "kingiideed"
     ]
 }

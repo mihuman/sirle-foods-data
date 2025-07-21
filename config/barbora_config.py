@@ -8,5 +8,8 @@ CATEGORIES = {
     "Kauasäilivad toidukaubad": "/kauasailivad-toidukaubad",
     "Külmutatud tooted": "/kulmutatud-tooted",
     "Joogid": "/joogid",
-    "Lastekaubad": "/lastekaubad"
+    "Enesehooldustooted": "/enesehooldustooted",
+    "Puhastustarbed ja lemmikloomatooted": "/puhastustarbed-ja-lemmikloomatooted",
+    "Lastekaubad": "/lastekaubad",
+    "Kodukaubad ja vaba aeg": "/kodukaubad-ja-vaba-aeg"
 }
