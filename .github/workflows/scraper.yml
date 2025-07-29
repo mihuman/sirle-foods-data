@@ -21,5 +21,8 @@ jobs:
       run: |
         pip install -r requirements.txt
     
+    - name: Create .env file
+      run: echo "MONGO_DB_URI=${{ secrets.MONGO_DB_URI }}" > .env
+    
     - name: Run scraper
       run: python scraper.py
