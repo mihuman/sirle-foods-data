@@ -75,7 +75,7 @@ def handle_product(product_info):
     except Exception as e:
         handle_error(e, url)
 
-def scrape():
+def scrape(no_details=False):
     for category in conf.CATEGORIES:
         print(category)
         category_id = conf.CATEGORIES[category]
@@ -86,7 +86,8 @@ def scrape():
         product_index = 0
         
         for product in products:
-            print(f"Product {product_index + 1}/{len(products)}", end="\r")
+            if not no_details:
+                print(f"Product {product_index + 1}/{len(products)}", end="\r")
             handle_product(product)
             product_index += 1
 

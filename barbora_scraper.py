@@ -129,7 +129,7 @@ def handle_product_page(url, price):
     except Exception as e:
         handle_error(e, url)
 
-def handle_products_page(url):
+def handle_products_page(url, no_details=False):
     try:
         selector = "div#category-page-results-placeholder > div > ul > li > div > div"
         soup = get_page_soup(url, selector, params)
@@ -140,7 +140,8 @@ def handle_products_page(url):
         link_index = 0
 
         for product_url, price in links_with_prices.items():
-            print(f"Page {params['page']}: {link_index + 1}/{len(links_with_prices)}", end="\r")
+            if not no_details:
+                print(f"Page {params['page']}: {link_index + 1}/{len(links_with_prices)}", end="\r")
 
             if has_product_with_url(product_url):
                 if price is not None:
@@ -171,7 +172,7 @@ def open_browser():
 def close_browser():
     driver.quit()
 
-def scrape():
+def scrape(no_details=False):
     open_browser()
 
     for category in conf.CATEGORIES:
@@ -182,10 +183,11 @@ def scrape():
         has_next_page = True
 
         while has_next_page:
-            print(f"Page {params['page']}", end="\r")
+            if not no_details:
+                print(f"Page {params['page']}", end="\r")
             url = f"{BASE_URL}{path}"
-            
-            has_next_page = handle_products_page(url)
+
+            has_next_page = handle_products_page(url, no_details=no_details)
 
     close_browser()
 

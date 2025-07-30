@@ -25,4 +25,4 @@ jobs:
       run: echo "MONGO_DB_URI=${{ secrets.MONGO_DB_URI }}" > .env
     
     - name: Run scraper
-      run: python scraper.py
+      run: python scraper.py --no-details

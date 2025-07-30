@@ -89,7 +89,7 @@ def handle_product_page(url, price):
     except Exception as e:
         handle_error(e, url)
 
-def handle_products_page(url):
+def handle_products_page(url, no_details=False):
     try:
         soup = get_page_soup(url, params)
 
@@ -99,7 +99,8 @@ def handle_products_page(url):
         link_index = 0
 
         for product_url, price in links_with_prices.items():
-            print(f"Page {params['page']}: {link_index + 1}/{len(links_with_prices)}", end="\r")
+            if not no_details:
+                print(f"Page {params['page']}: {link_index + 1}/{len(links_with_prices)}", end="\r")
             full_url = f"{BASE_URL}{product_url}"
 
             if has_product_with_url(full_url):
@@ -117,7 +118,7 @@ def handle_products_page(url):
     except Exception as e:
         handle_error(e, url)
 
-def scrape():
+def scrape(no_details=False):
     for category in conf.CATEGORIES:
         print(category)
         path = conf.CATEGORIES[category]
@@ -126,10 +127,11 @@ def scrape():
         has_next_page = True
 
         while has_next_page:
-            print(f"Page {params['page']}", end="\r")
+            if not no_details:
+                print(f"Page {params['page']}", end="\r")
             url = f"{BASE_URL}{path}"
             
-            has_next_page = handle_products_page(url)
+            has_next_page = handle_products_page(url, no_details=no_details)
 
 
 if __name__ == "__main__":
