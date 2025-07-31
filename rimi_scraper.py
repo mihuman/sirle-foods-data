@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import argparse
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -181,4 +182,7 @@ def scrape(no_details=False):
 
 
 if __name__ == "__main__":
-    scrape()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--no-details', action='store_true', help='Disable detailed logging for CI logs')
+    args = parser.parse_args()
+    scrape(no_details=args.no_details)

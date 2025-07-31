@@ -27,4 +27,4 @@ jobs:
       run: echo "MONGO_DB_URI=${{ secrets.MONGO_DB_URI }}" > .env
     
     - name: Run ${{ matrix.store }} scraper
-      run: python -u ${{ matrix.store }}_scraper.py
+      run: python -u ${{ matrix.store }}_scraper.py --no-details
