@@ -8,6 +8,9 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        store: [barbora, kaupmees, prisma, rimi, selver]
     
     steps:
     - uses: actions/checkout@v4
@@ -18,11 +21,10 @@ jobs:
         python-version: '3.10'
     
     - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
+      run: pip install -r requirements.txt
     
     - name: Create .env file
       run: echo "MONGO_DB_URI=${{ secrets.MONGO_DB_URI }}" > .env
     
-    - name: Run scraper
-      run: python -u scraper.py --no-details
+    - name: Run ${{ matrix.store }} scraper
+      run: python -u ${{ matrix.store }}_scraper.py
