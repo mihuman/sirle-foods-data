@@ -9,6 +9,7 @@ jobs:
   scrape:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         store: [barbora, kaupmees, prisma, rimi, selver]
     
