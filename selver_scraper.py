@@ -63,7 +63,12 @@ def get_barcode(soup):
     attributes_table = soup.find("table", {"class": "ProductAttributes__table"})
     for row in attributes_table.find_all("tr"):
         if row.find("th").text.strip() == "Ribakood":
-            return row.find("td").text.strip() 
+            return row.find("td").text.strip()
+
+def get_image(soup):
+    image_div = soup.find("div", {"class": "image"})
+    if image_div:
+        return image_div.find("img").get("src")
 
 def get_contents(soup):
     for item in soup.select("div.ProductInfoBox div.AttributeAccordion"):
@@ -90,8 +95,8 @@ def get_page_soup(url, wait_for_selector, query_params=None):
     except TimeoutException as e:
         raise e
 
-def insert_product_to_database(url, title, barcode, contents, price):
-    db_util.insert_product(url, title, barcode, contents, price, "SELVER")
+def insert_product_to_database(url, title, barcode, image, contents, price):
+    db_util.insert_product(url, title, barcode, image, contents, price, "SELVER")
 
 def handle_error(error, url):
     # network errors
@@ -120,9 +125,10 @@ def handle_product_page(url, price):
 
         title = get_product_title(soup)
         barcode = get_barcode(soup)
+        image = get_image(soup)
         contents = get_contents(soup)
 
-        insert_product_to_database(url, title, barcode, contents, price)
+        insert_product_to_database(url, title, barcode, image, contents, price)
 
     except Exception as e:
         handle_error(e, url)

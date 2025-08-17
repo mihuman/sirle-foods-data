@@ -22,11 +22,12 @@ def get_retailer_product_by_barcode(retailer, barcode):
 def get_all_products_by_barcode(barcode):
     return db.products.find({"bc": barcode})
 
-def insert_product(url, title, barcode, contents, price, retailer):
+def insert_product(url, title, barcode, image, contents, price, retailer):
     db.products.insert_one({
         "url": url,
         "title": title,
         "bc": barcode,
+        "img": image,
         "cts": contents,
         "prc": price,
         "rtlr": retailer,

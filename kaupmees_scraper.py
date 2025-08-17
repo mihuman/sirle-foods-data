@@ -18,8 +18,8 @@ NETWORK_ERROR_SLEEP = 60
 def has_product_with_barcode(barcode):
     return db_util.get_retailer_product_by_barcode("KAUPMEES", barcode) is not None
 
-def insert_product_to_database(url, title, barcode, contents, price):
-    db_util.insert_product(url, title, barcode, contents, price, "KAUPMEES")
+def insert_product_to_database(url, title, barcode, image, contents, price):
+    db_util.insert_product(url, title, barcode, image, contents, price, "KAUPMEES")
 
 def handle_error(error, url):
     # network errors
@@ -62,6 +62,7 @@ def handle_product(product_info):
         url = product_info["thumb"]
         title = product_info["name"]
         barcode = product_info["ean"]
+        image = product_info["image"]
         price = product_info["basePrice"]
 
         if has_product_with_barcode(barcode):
@@ -71,7 +72,7 @@ def handle_product(product_info):
             headers = {"Accept": "application/json"}
             contents = get_info(product_details_url, "INGREDIENTS", headers)
 
-            insert_product_to_database(url, title, barcode, contents, price)
+            insert_product_to_database(url, title, barcode, image, contents, price)
 
     except Exception as e:
         handle_error(e, url)

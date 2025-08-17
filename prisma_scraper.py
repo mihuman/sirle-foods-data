@@ -43,6 +43,10 @@ def get_barcode(soup):
     ean_element = soup.find("h3", string="EAN")
     return ean_element.find_next("div").find("span").text.strip()
 
+def get_image(soup):
+    product_div = soup.select("div[data-test-id='product-page-container']")
+    return product_div[0].find("img").get("src")
+
 def get_contents(soup):
     contents_element = soup.find("h3", string="Koostisosad")
     if contents_element:
@@ -53,8 +57,8 @@ def get_page_soup(url, query_params=None):
     sleep(PAGE_SWITCH_SLEEP)
     return BeautifulSoup(page.text, "html.parser")
 
-def insert_product_to_database(url, title, barcode, contents, price):
-    db_util.insert_product(url, title, barcode, contents, price, "PRISMA")
+def insert_product_to_database(url, title, barcode, image, contents, price):
+    db_util.insert_product(url, title, barcode, image, contents, price, "PRISMA")
 
 def handle_error(error, url):
     # network errors
@@ -83,9 +87,10 @@ def handle_product_page(url, price):
 
         title = get_product_title(soup)
         barcode = get_barcode(soup)
+        image = get_image(soup)
         contents = get_contents(soup)
 
-        insert_product_to_database(url, title, barcode, contents, price)
+        insert_product_to_database(url, title, barcode, image, contents, price)
 
     except Exception as e:
         handle_error(e, url)

@@ -56,6 +56,11 @@ def has_product_with_url(url):
 def get_product_title(soup):
     return soup.find("h1", {"class": "name"}).text.strip()
 
+def get_image(soup):
+    image_div = soup.find("div", {"class": "product__main-image"})
+    if image_div:
+        return image_div.find("img").get("src")
+
 def get_contents(soup):
     for div in soup.find_all("div", {"class": "product__list-wrapper"}):
         heading = div.find("p", {"class": "heading"})
@@ -81,8 +86,8 @@ def get_page_soup(url, wait_for_selector, query_params=None):
     except TimeoutException as e:
         raise e
 
-def insert_product_to_database(url, title, contents, price):
-    db_util.insert_product(url, title, None, contents, price, "RIMI")
+def insert_product_to_database(url, title, image, contents, price):
+    db_util.insert_product(url, title, None, image, contents, price, "RIMI")
 
 def handle_error(error, url):
     # network errors
@@ -110,9 +115,10 @@ def handle_product_page(url, price):
         soup = get_page_soup(url, "h1")
 
         title = get_product_title(soup)
+        image = get_image(soup)
         contents = get_contents(soup)
 
-        insert_product_to_database(url, title, contents, price)
+        insert_product_to_database(url, title, image, contents, price)
 
     except Exception as e:
         handle_error(e, url)
