@@ -33,18 +33,26 @@ driver = None
 def has_next_products_page(soup):
     return soup.find("a", {"aria-label": "Next &raquo;"}) is not None
 
+def get_price(euros, cents):
+    return float(f"{euros}.{cents}")
+
 def get_product_links_with_prices(soup):
     result = {}
 
     for item in soup.select("div.card"):
         price = None
         link = item.find("a", {"class": "card__url"}).get("href")
+        price_label_div = item.find("div", {"class": "price-label__price"})
         price_div = item.find("div", {"class": "card__price"})
 
-        if price_div:
+        if price_label_div:
+            euros = price_label_div.find("span", {"class": "major"}).text.strip()
+            cents = price_label_div.find("span", {"class": "cents"}).text.strip()
+            price = get_price(euros, cents)
+        elif price_div:
             euros = price_div.find("span").text.strip()
             cents = price_div.find("sup").text.strip()
-            price = float(f"{euros}.{cents}")
+            price = get_price(euros, cents)
 
         result[link] = price
 
