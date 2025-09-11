@@ -34,6 +34,12 @@ def has_next_products_page(soup):
     return soup.select_one("div.sf-pagination__item--next a") is not None
 
 def get_product_price(product_card):
+    price_label_span = product_card.find("span", {"class": "ProductBadge__badge--label"})
+
+    if price_label_span and price_label_span.text.strip() != "":
+        price_text = price_label_span.text.strip().split(" ")[0]
+        return float(price_text.replace(",", ".").strip())
+
     prices_div = product_card.find("div", {"class": "ProductPrices"})
 
     if prices_div.find("div", {"class": "ProductPrice--special"}):
